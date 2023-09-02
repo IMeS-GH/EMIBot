@@ -10,45 +10,59 @@ client.on('ready', () => {
 });
 
 client.on('messageCreate', (message) => {
-    const conteudo = message.content.split(' ').length === 1 ? message.content : message.content.split(' '); 
-    const autor = message.author; 
+    const conteudo = message.content.split(' ').length === 1 ? message.content : message.content.split(' ');
+    const autor = message.author;
 
-    
+
     if (autor.bot) return
-    
-    if (!Conta.db.has(autor.id)){
-        Conta.db.set(autor.id, new Conta({id: autor.id, nome: autor.username, nickname: autor.globalName}))
-    } 
-    
-    const conta = Conta.db.get(autor.id)
-    
-    if(typeof conteudo === 'object'){
-        if(conteudo[0] === '!transferir'){
-            const conta2 = Conta.db.get(autor)
+
+    if (!Conta.db.has(autor.username)) {
+        Conta.db.set(autor.username, new Conta(
+            {
+                id: autor.id,
+                nome: autor.username,
+                nickname: autor.globalName
+            }))
+    }
+
+    const conta = Conta.db.get(autor.username)
+
+    if (typeof conteudo === 'object') {
+
+        if (conteudo[0] === '!transferir') {
+            const conta2 = Conta.db.get(conteudo[1])
+
+            if (conta2 === undefined) {
+                message.channel.send(`Esse usuário não existe, impossível transferir uma graninha`)
+            }
+            else {
+                conta.saldo -= Number(conteudo[2])
+                conta2.saldo += Number(conteudo[2])
+            }
 
         }
     }
     // Comandos -------------------------------------------------------
 
-    if(conteudo === "Calopsita"){
+    if (conteudo === "Calopsita") {
         message.channel.send('https://media.discordapp.net/attachments/519307505822597144/1108096092706439198/cockatiel.gif')
     }
 
-    if(conteudo === "!conta"){
+    if (conteudo === "!conta") {
         const dados = conta.mostrarConta()
         message.channel.send(`Usuário ${dados.nickname} possui ${dados.saldo} sementes de girassol`)
     }
 
-    if(conteudo === "!trabalhar"){
+    if (conteudo === "!trabalhar") {
         const trabalho = conta.trabalhar()
-        if (trabalho){
+        if (trabalho) {
             message.channel.send(`Usuário ${conta.nickname} trabalhou, ganhando ${trabalho} sementes de girassól`)
         } else {
             message.channel.send(`Usuário ${conta.nickname} não pode trabalhar, está muito cansado.`)
         }
     }
 
-    if(conteudo === "!consulta"){
+    if (conteudo === "!consulta") {
         const mensagem = Conta.db
         mensagem.forEach((conta) => {
             console.log(conta)
