@@ -16,8 +16,10 @@ client.on('messageCreate', (message) => {
     if (!Conta.db.has(autor.id)){
         Conta.db.set(autor.id, new Conta({id: autor.id, nome: autor.username}))
     } 
-
+    
     const conta = Conta.db.get(autor.id)
+
+    // Comandos -------------------------------------------------------
 
     if(conteudo === "Calopsita"){
         message.channel.send('https://media.discordapp.net/attachments/519307505822597144/1108096092706439198/cockatiel.gif')
