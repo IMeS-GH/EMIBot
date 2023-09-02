@@ -3,9 +3,10 @@ class Conta{
     static db = new Map()
 
 
-    constructor({id, nome}){
+    constructor({id, nome, nickname}){
         this.id = id
         this.nome = nome
+        this.nickname = nickname
         this.saldo = 0
         this.ultimoTrabalho = 0
     }
