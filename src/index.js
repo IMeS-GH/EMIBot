@@ -12,6 +12,7 @@ client.on('ready', () => {
 client.on('messageCreate', (message) => {
     const conteudo = message.content; 
     const autor = message.author; 
+    if (autor.bot) return
 
     if (!Conta.db.has(autor.id)){
         Conta.db.set(autor.id, new Conta({id: autor.id, nome: autor.username}))
