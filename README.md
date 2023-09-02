@@ -7,3 +7,4 @@ Link do repositório do desafio: [Projeto de final de módulo 1 - Discord Bot](h
 
 - Isabela Menezes (IMenezes)
 - Eric Altão (Altovisk09)
+- Matheus Benasse (1Matzh)
