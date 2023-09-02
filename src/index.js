@@ -19,6 +19,10 @@ client.on('messageCreate', (message) => {
 
     const conta = Conta.db.get(autor.id)
 
+    if (conteudo === "debug"){
+        message.channel.send(`${message}`)
+    }
+
     if(conteudo === "Calopsita"){
         message.channel.send('https://media.discordapp.net/attachments/519307505822597144/1108096092706439198/cockatiel.gif')
     }
