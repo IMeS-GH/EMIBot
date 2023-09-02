@@ -1,5 +1,7 @@
 // importamos a biblioteca discord.js
 const { Client, GatewayIntentBits } = require("discord.js");
+require('dotenv').config();
+const token = process.env.token
 
 // criamos uma instancia do cliente discord.js
 // o construtor da classe Client recebe um objeto como parametro
@@ -33,4 +35,4 @@ client.on('messageCreate', (message) => {
 });
 
 // aqui iniciamos o login do discord, fazendo com que ele conecte e ative o seu sistema de eventos que criamos acima.
-client.login("meu token do discord");
+client.login(token);
