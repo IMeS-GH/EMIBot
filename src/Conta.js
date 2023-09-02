@@ -27,6 +27,18 @@ class Conta{
 
         return false
     }
+
+    transferir(usuario, valor){
+        valor = Number(valor)
+        if (usuario === undefined || isNaN(valor)) return ('Não foi possível realizar essa transferência, conta ou valor não existe')
+        if (valor > this.saldo) return ('https://i1.sndcdn.com/avatars-6MYmIsqrQG5zqYs7-CAXKkg-t500x500.jpg \nVocê não tem dinheiro o suficiente.')
+
+
+        this.saldo -= Number(valor)
+        usuario.saldo += Number(valor)
+
+        return (`Usuário ${this.nickname} transferiu ${valor} para ${usuario.nickname}.`)
+    }
 }
 
 module.exports = Conta

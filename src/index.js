@@ -36,8 +36,7 @@ client.on('messageCreate', (message) => {
                 message.channel.send(`Esse usuário não existe, impossível transferir uma graninha`)
             }
             else {
-                conta.saldo -= Number(conteudo[2])
-                conta2.saldo += Number(conteudo[2])
+                message.channel.send(conta.transferir(conta2, conteudo[2]))
             }
 
         }
