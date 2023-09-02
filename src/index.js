@@ -19,18 +19,15 @@ client.on('messageCreate', (message) => {
 
     const conta = Conta.db.get(autor.id)
 
-    if (conteudo === "debug"){
-        message.channel.send(`${message}`)
-    }
-
     if(conteudo === "Calopsita"){
         message.channel.send('https://media.discordapp.net/attachments/519307505822597144/1108096092706439198/cockatiel.gif')
     }
 
     if(conteudo === "!conta"){
         const dados = conta.mostrarConta()
-        message.channel.send(`Usuário ${dados.nome}, o id é ${dados.id} possui ${dados.saldo} sementes de girassol`)
+        message.channel.send(`Usuário ${dados.nome} possui ${dados.saldo} sementes de girassol`)
     }
+
     if(conteudo === "!trabalhar"){
         const trabalho = conta.trabalhar()
         if (trabalho){
@@ -40,6 +37,14 @@ client.on('messageCreate', (message) => {
         }
     }
 
+    if(conteudo === "!consulta"){
+        const mensagem = Conta.db
+        mensagem.forEach((conta) => {
+            console.log(conta)
+            message.channel.send(`${conta.id}\n${conta.nome}\n${conta.saldo}`)
+
+        })
+    }
 });
 
 client.login(token);
