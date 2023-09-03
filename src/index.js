@@ -1,5 +1,6 @@
 const { Client, GatewayIntentBits } = require("discord.js");
 const Conta = require('./contas.js');
+const {Jokenpo} = require('./apostas.js')
 
 require('dotenv').config();
 
@@ -105,6 +106,13 @@ client.on('messageCreate', (message) => {
             message.reply('Conta laranja criada com sucesso!')
 
         }
+
+    }
+
+    if (comando === "jokenpo"){
+        const jogo = new Jokenpo(args[0])
+
+        message.reply(jogo.resultado)
 
     }
     
