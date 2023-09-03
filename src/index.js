@@ -49,7 +49,7 @@ client.on('messageCreate', (message) => {
 
     if (comando === "conta") {
         const dados = conta.mostrarConta()
-        message.reply(`Usuário ${dados.nome} possui ${dados.saldo} dinheiros.`)
+        message.reply(`Usuário ${dados.nome}(${dados.username}) possui ${dados.saldo} dinheiros.`)
     };
 
     if (comando === "trab" || comando === "trabalhar") {
@@ -67,7 +67,7 @@ client.on('messageCreate', (message) => {
             console.log(conta);
             // Verifique se a mensagem foi enviada pelo bot
             if (!message.author.bot) {
-                message.channel.send(`${conta.id}\n${conta.username}\n${conta.nome}\n${conta.saldo}\n`);
+                message.channel.send(`> **ID:** ${conta.id}\n> **Usuário:**${conta.username}\n> **Nome:**${conta.nome}\n> **Saldo:** ${conta.saldo}\n`);
             }
         })
     }
