@@ -12,6 +12,7 @@ const client = new Client({
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent
     ]
+
 });
 
 client.on('ready', () => {
@@ -58,7 +59,7 @@ client.on('messageCreate', (message) => {
         if (trabalho) {
             message.reply(`Usuário ${conta.nome} trabalhou, ganhando ${trabalho} dinheiros`)
         } else {
-            message.reply(`Usuário ${conta.nome} não pode trabalhar!`)
+            message.reply(`Usuário ${conta.nome} não pode trabalhar!`);
         }
     };
 
