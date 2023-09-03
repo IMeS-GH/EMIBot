@@ -45,16 +45,12 @@ client.on('messageCreate', (message) => {
     const comando = args.shift().toLowerCase();
 
 
-    if (comando === "calopsita") {
-        message.reply('https://media.discordapp.net/attachments/519307505822597144/1108096092706439198/cockatiel.gif')
-    };
-
     if (comando === "conta") {
         const dados = conta.mostrarConta()
         message.reply(`Usuário ${dados.nome} possui ${dados.saldo} dinheiros.`)
     };
 
-    if (comando === "trab") {
+    if (comando === "trab" || comando === "trabalhar") {
         const trabalho = conta.trabalhar()
         if (trabalho) {
             message.reply(`Usuário ${conta.nome} trabalhou, ganhando ${trabalho} dinheiros`)
@@ -63,7 +59,7 @@ client.on('messageCreate', (message) => {
         }
     };
 
-    if (comando === "con") {
+    if (comando === "contas") {
         const mensagem = Conta.db;
         mensagem.forEach((conta) => {
             console.log(conta);
