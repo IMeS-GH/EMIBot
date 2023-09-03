@@ -25,6 +25,8 @@ client.on('messageCreate', (message) => {
 
     const args = conteudo.slice(prefix.length).split(' ');
 
+    console.log(Conta.db)
+
     if (!Conta.db.has(autor.username) && !autor.bot) {
         const novaConta = new Conta({
             id: autor.id,
@@ -65,7 +67,7 @@ client.on('messageCreate', (message) => {
             console.log(conta);
             // Verifique se a mensagem foi enviada pelo bot
             if (!message.author.bot) {
-                message.channel.send(`${conta.id}\n${conta.nome}\n${conta.saldo}`);
+                message.channel.send(`${conta.id}\n${conta.username}\n${conta.nome}\n${conta.saldo}\n`);
             }
         })
     }
@@ -75,13 +77,14 @@ client.on('messageCreate', (message) => {
             const contaDestinatario = Conta.db.get(args[0])
             const valorTransferencia = Number(args[1])
 
+            console.log(contaDestinatario, valorTransferencia)
+
             if (contaDestinatario === undefined || isNaN(valorTransferencia)) return ("Conta ou valor inválido!")
         
             const transferencia = conta.transferir(contaDestinatario, valorTransferencia)
             message.reply(transferencia)
         }
     }
-
 });
 
 client.login(token);
