@@ -104,9 +104,7 @@ client.on('messageCreate', (message) => {
             Conta.db.set(contaLaranja.username, contaLaranja)
     
             message.reply('Conta laranja criada com sucesso!')
-
         }
-
     }
 
     if (comando === "jokenpo"){
@@ -116,6 +114,44 @@ client.on('messageCreate', (message) => {
 
     }
     
+    if (comando === "aposta") {
+        const corAposta = args[0];
+        const valorAposta = Number(args[1]);
+
+        if (autor.id === client.user.id) return;
+
+        if(['vermelho', 'preto', 'branco'].includes(corAposta) && !isNaN(valorAposta) &&
+        valorAposta >= 0){
+            if (valorAposta > conta.saldo) {
+                message.reply('Você não tem saldo suficiente para fazer essa aposta.');
+            } else {
+                // Calcula um número aleatório entre 1 e 100
+                const resultado = Math.floor(Math.random() * 100) + 1;
+
+                let mensagemResultado = `Você apostou ${valorAposta} na cor ${corAposta}.\n`;
+
+                if (corAposta === 'branco' && resultado <= 10) { // 10% de chance para branco
+                    const ganho = valorAposta * 9; // Pagamento 9x
+                    conta.saldo += ganho;
+                    mensagemResultado += `Você ganhou! Seu saldo agora é ${conta.saldo}.`;
+                } else if (
+                    (corAposta === 'vermelho' && resultado <= 45) ||
+                    (corAposta === 'preto' && resultado <= 45)
+                ) {
+                    const ganho = valorAposta * 2; // Pagamento 2x
+                    conta.saldo += ganho;
+                    mensagemResultado += `Você ganhou! Seu saldo agora é ${conta.saldo}.`;
+                } else {
+                    conta.saldo -= valorAposta;
+                    mensagemResultado += `Você perdeu! Seu saldo agora é ${conta.saldo}.`;
+                }
+
+                message.reply(mensagemResultado);
+            }
+        } else {
+            message.reply('Uso correto: !aposta <vermelho/preto/branco> <valor>');
+        }
+    }
 });
 
 client.login(token);
