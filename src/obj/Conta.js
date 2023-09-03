@@ -11,6 +11,7 @@ class Conta {
     }
     conta(){
         let tempoTrabalhado = new Date().valueOf()
+
        const info = {
             nome: this.nome,
             nick: this.nick,
@@ -34,9 +35,12 @@ class Conta {
         }
     }
 
-    depositar(saldo){
-        this.saldo -= saldo
-        return this
+    depositar(destinatario, valor){
+       
+        this.saldo -= valor;
+        destinatario.saldo += valor;
+
+
     }
     
 }
