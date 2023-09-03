@@ -1,6 +1,6 @@
 const { Client, GatewayIntentBits } = require("discord.js");
 const Conta = require('./contas.js');
-const {Jokenpo} = require('./jogos.js')
+const {ApostaCores, Jokenpo} = require('./jogos.js')
 
 require('dotenv').config();
 
@@ -117,6 +117,8 @@ client.on('messageCreate', (message) => {
     if (comando === "aposta") {
         const corAposta = args[0];
         const valorAposta = Number(args[1]);
+
+        const jogo = new ApostaCores
 
         if (autor.id === client.user.id) return;
 
