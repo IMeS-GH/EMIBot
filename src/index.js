@@ -1,16 +1,18 @@
 const { Client, GatewayIntentBits } = require("discord.js");
 const Conta = require('./contas.js');
+
 require('dotenv').config();
 
-const token = process.env.token
-const prefix = '+'
+const token = process.env.token;
+const prefix = process.env.prefix || '!'; // Se o prefix não for encontrado no arquivo .env, ! é utilizado
 
 const client = new Client({
-     intents: [
-        GatewayIntentBits.Guilds, 
-        GatewayIntentBits.GuildMessages, 
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent
-    ] 
+    ]
+
 });
 
 client.on('ready', () => {
@@ -18,35 +20,48 @@ client.on('ready', () => {
 });
 
 client.on('messageCreate', (message) => {
-    const conteudo = message.content; 
-    const autor = message.author; 
+    const conteudo = message.content;
+    const autor = message.author;
+
+    const args = conteudo.slice(prefix.length).split(' ');
 
     // Verifique se a mensagem começa com o prefixo e não foi enviada pelo bot
-    if (!conteudo.startsWith(prefix) || autor.bot) return;
+    if (!conteudo[0].startsWith(prefix) || autor.bot) return;
 
     // Divide a mensagem em partes
-    const args = conteudo.slice(prefix.length).trim().split(/ +/);
     const comando = args.shift().toLowerCase();
 
-    if (!Conta.db.has(autor.id)){
-        Conta.db.set(autor.id, new Conta({id: autor.id, nome: autor.globalName, username: autor.username, saldo: 0, ultimoTrabalho: 0}))
-    } 
-    
-    const conta = Conta.db.get(autor.id)
+    if (!Conta.db.has(autor.username)) {
+        const novaConta = new Conta({
+            id: autor.id,
+            nome: autor.globalName,
+            username: autor.username,
+            saldo: 0,
+            ultimoTrabalho: 0
+        })
 
-    if(comando === "conta"){
+        Conta.db.set(autor.username, novaConta)
+    };
+
+    const conta = Conta.db.get(autor.username)
+
+    if (comando === "calopsita") {
+        message.reply('https://media.discordapp.net/attachments/519307505822597144/1108096092706439198/cockatiel.gif')
+    };
+
+    if (comando === "conta") {
         const dados = conta.mostrarConta()
         message.reply(`Usuário ${dados.nome} possui ${dados.saldo} dinheiros.`)
-    }
+    };
 
-    if(comando === "trab"){
+    if (comando === "trab") {
         const trabalho = conta.trabalhar()
-        if (trabalho){
+        if (trabalho) {
             message.reply(`Usuário ${conta.nome} trabalhou, ganhando ${trabalho} dinheiros`)
         } else {
-            message.reply(`Usuário ${conta.nome} não pode trabalhar!`)
+            message.reply(`Usuário ${conta.nome} não pode trabalhar!`);
         }
-    }
+    };
 
     if (comando === "con") {
         const mensagem = Conta.db;
