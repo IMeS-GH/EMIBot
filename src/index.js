@@ -1,5 +1,6 @@
 const { Client, GatewayIntentBits } = require("discord.js");
 const Conta = require('./contas.js');
+const {Jokenpo, ApostaCores} = require('./jogos.js')
 const helpCommand = require('./commands/help.js');
 
 require('dotenv').config();
@@ -107,43 +108,22 @@ client.on('messageCreate', (message) => {
         }
     }
 
+    if (comando === "jokenpo"){
+        const jogo = new Jokenpo(autor, args[0])
+
+        message.reply(jogo.resultado)
+
+    }
+    
     if (comando === "aposta") {
         const corAposta = args[0];
         const valorAposta = Number(args[1]);
 
         if (autor.id === client.user.id) return;
 
-        if(['vermelho', 'preto', 'branco'].includes(corAposta) && !isNaN(valorAposta) &&
-        valorAposta >= 0){
-            if (valorAposta > conta.saldo) {
-                message.reply('Você não tem saldo suficiente para fazer essa aposta.');
-            } else {
-                // Calcula um número aleatório entre 1 e 100
-                const resultado = Math.floor(Math.random() * 100) + 1;
+        const jogo = new ApostaCores(autor, corAposta, valorAposta)
+        message.reply(jogo.message)
 
-                let mensagemResultado = `Você apostou ${valorAposta} na cor ${corAposta}.\n`;
-
-                if (corAposta === 'branco' && resultado <= 10) { // 10% de chance para branco
-                    const ganho = valorAposta * 9; // Pagamento 9x
-                    conta.saldo += ganho;
-                    mensagemResultado += `Você ganhou! Seu saldo agora é ${conta.saldo}.`;
-                } else if (
-                    (corAposta === 'vermelho' && resultado <= 45) ||
-                    (corAposta === 'preto' && resultado <= 45)
-                ) {
-                    const ganho = valorAposta * 2; // Pagamento 2x
-                    conta.saldo += ganho;
-                    mensagemResultado += `Você ganhou! Seu saldo agora é ${conta.saldo}.`;
-                } else {
-                    conta.saldo -= valorAposta;
-                    mensagemResultado += `Você perdeu! Seu saldo agora é ${conta.saldo}.`;
-                }
-
-                message.reply(mensagemResultado);
-            }
-        } else {
-            message.reply('Uso correto: !aposta <vermelho/preto/branco> <valor>');
-        }
     }
 
     if (comando === 'help') {
