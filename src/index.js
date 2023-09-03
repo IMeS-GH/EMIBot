@@ -25,13 +25,7 @@ client.on('messageCreate', (message) => {
 
     const args = conteudo.slice(prefix.length).split(' ');
 
-    // Verifique se a mensagem começa com o prefixo e não foi enviada pelo bot
-    if (!conteudo[0].startsWith(prefix) || autor.bot) return;
-
-    // Divide a mensagem em partes
-    const comando = args.shift().toLowerCase();
-
-    if (!Conta.db.has(autor.username)) {
+    if (!Conta.db.has(autor.username) && !autor.bot) {
         const novaConta = new Conta({
             id: autor.id,
             nome: autor.globalName,
@@ -42,8 +36,14 @@ client.on('messageCreate', (message) => {
 
         Conta.db.set(autor.username, novaConta)
     };
+    const conta = Conta.db.get(autor.username) // Conta do usuário do contexto da mensagem
 
-    const conta = Conta.db.get(autor.username)
+    // Verifique se a mensagem começa com o prefixo e não foi enviada pelo bot
+    if (!conteudo[0].startsWith(prefix) || autor.bot) return;
+
+    // Divide a mensagem em partes
+    const comando = args.shift().toLowerCase();
+
 
     if (comando === "calopsita") {
         message.reply('https://media.discordapp.net/attachments/519307505822597144/1108096092706439198/cockatiel.gif')
