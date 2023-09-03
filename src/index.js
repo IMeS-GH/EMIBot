@@ -3,8 +3,8 @@ const Conta = require('./contas.js');
 
 require('dotenv').config();
 
-const token = process.env.token
-const prefix = '+'
+const token = process.env.token;
+const prefix = '+';
 
 const client = new Client({
     intents: [
@@ -40,18 +40,18 @@ client.on('messageCreate', (message) => {
         })
 
         Conta.db.set(autor.username, novaConta)
-    }
+    };
 
     const conta = Conta.db.get(autor.username)
 
     if (comando === "calopsita") {
         message.reply('https://media.discordapp.net/attachments/519307505822597144/1108096092706439198/cockatiel.gif')
-    }
+    };
 
     if (comando === "conta") {
         const dados = conta.mostrarConta()
         message.reply(`Usuário ${dados.nome} possui ${dados.saldo} dinheiros.`)
-    }
+    };
 
     if (comando === "trab") {
         const trabalho = conta.trabalhar()
@@ -60,7 +60,7 @@ client.on('messageCreate', (message) => {
         } else {
             message.reply(`Usuário ${conta.nome} não pode trabalhar!`)
         }
-    }
+    };
 
     if (comando === "con") {
         const mensagem = Conta.db;
