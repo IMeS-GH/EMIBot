@@ -1,10 +1,11 @@
 const { Client, GatewayIntentBits } = require("discord.js");
 const Conta = require('./contas.js');
+const helpCommand = require('./commands/help.js');
 
 require('dotenv').config();
 
 const token = process.env.token;
-const prefix = process.env.prefix || '!'; // Se o prefix não for encontrado no arquivo .env, ! é utilizado
+const prefix = process.env.prefix || '+'; // Se o prefix não for encontrado no arquivo .env, ! é utilizado
 
 const client = new Client({
     intents: [
@@ -143,6 +144,10 @@ client.on('messageCreate', (message) => {
         } else {
             message.reply('Uso correto: !aposta <vermelho/preto/branco> <valor>');
         }
+    }
+
+    if (comando === 'help') {
+        helpCommand.execute(message, prefix);
     }
 });
 
