@@ -29,7 +29,13 @@ client.on('messageCreate', (message) => {
     const comando = args.shift().toLowerCase();
 
     if (!Conta.db.has(autor.id)){
-        Conta.db.set(autor.id, new Conta({id: autor.id, nome: autor.globalName, username: autor.username, saldo: 0, ultimoTrabalho: 0}))
+        Conta.db.set(autor.id, new Conta({
+            id: autor.id, 
+            nome: autor.globalName, 
+            username: autor.username, 
+            saldo: 0, 
+            ultimoTrabalho: 0
+        }))
     } 
     
     const conta = Conta.db.get(autor.id)
@@ -54,9 +60,34 @@ client.on('messageCreate', (message) => {
             console.log(conta);
             // Verifique se a mensagem foi enviada pelo bot
             if (!message.author.bot) {
-                message.channel.send(`${conta.id}\n${conta.nome}\n${conta.saldo}`);
+                message.channel.send(`${conta.id}\n${conta.user}\n${conta.saldo}`);
             }
         })
+    }
+
+    if (comando === "transf") {
+        const targetUsername = args[0];
+        const transferAmount = parseInt(args[1]);
+
+        if (!targetUsername || isNaN(transferAmount)) {
+            message.reply("Comando de transferência inválido. Use !transf <username> <valor>.");
+            return;
+        }
+
+        const targetUser = Array.from(Conta.db.values()).find((user) => user.username === targetUsername);
+
+        if (!targetUser) {
+            message.reply("Usuário de destino não encontrado.");
+            return;
+        }
+
+        const transferResult = conta.transferir(targetUser, transferAmount);
+
+        if (typeof transferResult === "string") {
+            message.reply(transferResult);
+        } else {
+            message.reply(transferResult);
+        }
     }
 });
 
