@@ -84,8 +84,6 @@ client.on('messageCreate', (message) => {
             const transferencia = conta.transferir(contaDestinatario, valorTransferencia)
             message.reply(transferencia)
         }
-        // console.log(args)
-        // const contaDestinatario = args[2]
     }
 
 });
