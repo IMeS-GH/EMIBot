@@ -73,6 +73,21 @@ client.on('messageCreate', (message) => {
             }
         })
     }
+
+    if (comando === "trans" || comando === "transferir"){
+        if (args.length === 2){
+            const contaDestinatario = Conta.db.get(args[0])
+            const valorTransferencia = Number(args[1])
+
+            if (contaDestinatario === undefined || isNaN(valorTransferencia)) return ("Conta ou valor inválido!")
+        
+            const transferencia = conta.transferir(contaDestinatario, valorTransferencia)
+            message.reply(transferencia)
+        }
+        // console.log(args)
+        // const contaDestinatario = args[2]
+    }
+
 });
 
 client.login(token);
