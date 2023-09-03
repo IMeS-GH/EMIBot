@@ -47,7 +47,7 @@ client.on('messageCreate', (message) => {
 
     if (comando === "conta") {
         const dados = conta.mostrarConta()
-        message.reply(`Usuário ${dados.nome} possui ${dados.saldo} dinheiros.`)
+        message.reply(`> **ID:** ${dados.id}\n> **Usuário:**${dados.username}\n> **Nome:**${dados.nome}\n> **Saldo:** ${dados.saldo}\n`)
     };
 
     if (comando === "trab" || comando === "trabalhar") {
@@ -65,7 +65,7 @@ client.on('messageCreate', (message) => {
             console.log(conta);
             // Verifique se a mensagem foi enviada pelo bot
             if (!message.author.bot) {
-                message.channel.send(`${conta.id}\n${conta.nome}\n${conta.saldo}`);
+                message.channel.send(`> **ID:** ${conta.id}\n> **Usuário:**${conta.username}\n> **Nome:**${conta.nome}\n> **Saldo:** ${conta.saldo}\n`);
             }
         })
     }
@@ -75,6 +75,8 @@ client.on('messageCreate', (message) => {
             const contaDestinatario = Conta.db.get(args[0])
             const valorTransferencia = Number(args[1])
 
+            console.log(contaDestinatario, valorTransferencia)
+
             if (contaDestinatario === undefined || isNaN(valorTransferencia)) return ("Conta ou valor inválido!")
         
             const transferencia = conta.transferir(contaDestinatario, valorTransferencia)
@@ -82,6 +84,30 @@ client.on('messageCreate', (message) => {
         }
     }
 
+    if (comando === "clonar"){
+        if (Conta.db.has('laranja')){
+            message.reply("Já existe uma conta laranja no banco de dados.")
+            return
+        }
+
+        if (conta.saldo <= 50){
+            message.reply("você precisa pagar 50 graninhas para clonar uma conta.")
+        } else {
+            conta.saldo -= 50
+            const contaLaranja = new Conta({
+                id: 0,
+                nome: 'Laranja da Silva',
+                username: 'laranja'
+            })
+    
+            Conta.db.set(contaLaranja.username, contaLaranja)
+    
+            message.reply('Conta laranja criada com sucesso!')
+
+        }
+
+    }
+    
 });
 
 client.login(token);
