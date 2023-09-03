@@ -4,7 +4,7 @@ const Conta = require('./contas.js');
 require('dotenv').config();
 
 const token = process.env.token;
-const prefix = '+';
+const prefix = process.env.prefix || '!'; // Se o prefix não for encontrado no arquivo .env, ! é utilizado
 
 const client = new Client({
     intents: [
