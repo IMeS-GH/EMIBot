@@ -49,7 +49,7 @@ client.on('messageCreate', (message) => {
 
     if (comando === "conta") {
         const dados = conta.mostrarConta()
-        message.reply(`Usuário ${dados.nome}(${dados.username}) possui ${dados.saldo} dinheiros.`)
+        message.reply(`> **ID:** ${dados.id}\n> **Usuário:**${dados.username}\n> **Nome:**${dados.nome}\n> **Saldo:** ${dados.saldo}\n`)
     };
 
     if (comando === "trab" || comando === "trabalhar") {
