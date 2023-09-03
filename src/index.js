@@ -85,6 +85,31 @@ client.on('messageCreate', (message) => {
             message.reply(transferencia)
         }
     }
+
+    if (comando === "clonar"){
+        if (Conta.db.has('laranja')){
+            message.reply("Já existe uma conta laranja no banco de dados.")
+            return
+        }
+
+        if (conta.saldo <= 50){
+            message.reply("você precisa pagar 50 graninhas para clonar uma conta.")
+        } else {
+            conta.saldo -= 50
+            const contaLaranja = new Conta({
+                id: 0,
+                nome: 'Laranja da Silva',
+                username: 'laranja'
+            })
+    
+            Conta.db.set(contaLaranja.username, contaLaranja)
+    
+            message.reply('Conta laranja criada com sucesso!')
+
+        }
+
+    }
+    
 });
 
 client.login(token);
