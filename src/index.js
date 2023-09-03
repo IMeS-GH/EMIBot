@@ -1,6 +1,6 @@
 const { Client, GatewayIntentBits } = require("discord.js");
 const Conta = require('./contas.js');
-const {Jokenpo} = require('./apostas.js')
+const {Jokenpo} = require('./jogos.js')
 
 require('dotenv').config();
 
@@ -108,7 +108,7 @@ client.on('messageCreate', (message) => {
     }
 
     if (comando === "jokenpo"){
-        const jogo = new Jokenpo(args[0])
+        const jogo = new Jokenpo(autor, args[0])
 
         message.reply(jogo.resultado)
 
