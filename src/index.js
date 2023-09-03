@@ -25,8 +25,6 @@ client.on('messageCreate', (message) => {
 
     const args = conteudo.slice(prefix.length).split(' ');
 
-    console.log(Conta.db)
-
     if (!Conta.db.has(autor.username) && !autor.bot) {
         const novaConta = new Conta({
             id: autor.id,
