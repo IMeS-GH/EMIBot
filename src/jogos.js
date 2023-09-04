@@ -122,14 +122,11 @@ class VinteUm extends Jogo{
 
     constructor(autor, versus, valorAposta=100){
         super(autor)
-
-        // if (!versus.bot) this.versus = Conta.db.get(versus)
-        if (isNaN(valorAposta)) return {message: 'Algo deu errado.'}
-
+        
         this.versus = versus
         this.versus.conta = Conta.db.get(versus.username) || {saldo: 0}
         this.reply = {status: 'fail', message: 'Algo deu errado', valor: 0}
-        this.valorAposta = valorAposta
+        this.valorAposta = Number(valorAposta)
 
         this.player1 = {
             baralho: [...VinteUm.gerarCarta()],

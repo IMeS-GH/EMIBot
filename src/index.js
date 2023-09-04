@@ -49,7 +49,12 @@ client.on('messageCreate', (message) => {
 
     if (comando === "conta") {
         const dados = conta.mostrarConta()
-        message.reply(`> **ID:** ${dados.id}\n> **Usuário:**${dados.username}\n> **Nome:**${dados.nome}\n> **Saldo:** ${dados.saldo}\n`)
+        if (dados.id !== 'dead'){
+            message.reply(`> **ID:** ${dados.id}\n> **Usuário:**${dados.username}\n> **Nome:**${dados.nome}\n> **Saldo:** ${dados.saldo}\n`)
+        } else {
+            message.reply(`> **Usuário ${dados.username} está morto**`)
+        }
+
     };
 
     if (comando === "trab" || comando === "trabalhar") {
@@ -127,7 +132,7 @@ client.on('messageCreate', (message) => {
         const resposta = message.channel.createMessageCollector({filter: (m) => {return autor.id === m.author.id && !m.author.bot}, time: 30000 });
         const versus = args[1] || client.user
 
-        const jogo = new VinteUm(autor, versus, Number(args[0]))
+        const jogo = new VinteUm(autor, versus, args[0])
 
         message.reply(`${jogo.mostrarMaos()}\n suas opções: <sacar/parar>`)
 
@@ -170,6 +175,8 @@ client.on('messageCreate', (message) => {
                 setTimeout(() => message.author.send('https://i1.sndcdn.com/avatars-6MYmIsqrQG5zqYs7-CAXKkg-t500x500.jpg'), 10000)
                 setTimeout(() => message.author.send('**Hasta la vista**'), 15000)
 
+
+                conta.id = 'dead'
             }
         })
     }
