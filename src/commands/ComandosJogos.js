@@ -32,6 +32,19 @@ const commandVinteUm = {
     description: 'Inicial um jogo de 21',
 
     execute(message, autor, args, client){
+        if (Conta.db.get(autor.username).saldo < args[0]) {
+            message.reply('Você não tem saldo o suficienta para essa aposta')
+            return
+        }
+        if (args[0] < 0){
+            message.reply('Você não pode apostar um número negativo.')
+            return
+        }
+        if (isNaN(Number(args[0]))){
+            message.reply('Valor de aposta precisa ser  um número.')
+            return
+        }
+
         const resposta = message.channel.createMessageCollector({ filter: (m) => { return !m.author.bot }, time: 60000 });
         if (args[1] !== undefined && !Conta.db.has(args[1])) {
             message.reply('Esse usuário não existe no banco de dados')
@@ -103,15 +116,6 @@ const commandVinteUm = {
             } else {
                 conta.saldo += jogo.valorAposta
                 conta2.saldo -= jogo.valorAposta
-            }
-
-            if (jogo.reply.status === 'perdeu' && conta.saldo < 0) {
-                message.author.send('Ora ora... Parece que você está sem dinheiro')
-                setTimeout(() => message.author.send('*Infelizmente, nosso contrato encerra aqui.*'), 6000)
-                setTimeout(() => message.author.send('https://i1.sndcdn.com/avatars-6MYmIsqrQG5zqYs7-CAXKkg-t500x500.jpg'), 10000)
-                setTimeout(() => message.author.send('**Hasta la vista**'), 15000)
-
-                conta.id = 'dead'
             }
         })
     }

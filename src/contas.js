@@ -38,8 +38,6 @@ class Conta{
         this.saldo -= valor;
         destino.saldo += valor;
 
-        console.log('teste')
-
         return `Transferência bem-sucedida! ${this.nome} transferiu ${valor} dinheiros para ${destino.nome}.`;
     }
 }
