@@ -6,7 +6,7 @@ const helpCommand = require('./commands/help.js');
 require('dotenv').config();
 
 const token = process.env.token;
-const prefix = process.env.prefix || '+'; // Se o prefix não for encontrado no arquivo .env, ! é utilizado
+const prefix = process.env.prefix || '!'; // Se o prefix não for encontrado no arquivo .env, ! é utilizado
 
 const client = new Client({
     intents: [
