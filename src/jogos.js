@@ -166,21 +166,25 @@ class VinteUm extends Jogo{
             this.reply.message = `${this.autor.username} Perdeu!`
             this.contaAutor.saldo -= this.valorAposta
             this.versus.conta.saldo += this.valorAposta
+            this.reply.status = 'venceu'
         } 
         else if (this.player2.pontos > 21) {
             this.reply.message = `${this.versus.username} Perdeu!`
             this.contaAutor.saldo += this.valorAposta
             this.versus.conta.saldo -= this.valorAposta
+            this.reply.status = 'perdeu'
         } 
         else if (this.player1.pontos > this.player2.pontos) {
             this.reply.message = `${this.autor.username} Venceu!`
             this.contaAutor.saldo += this.valorAposta
             this.versus.conta.saldo -= this.valorAposta
+            this.reply.status = 'venceu'
         }
         else if (this.player1.pontos < this.player2.pontos) {
             this.reply.message = `${this.versus.username} Venceu!`
             this.contaAutor.saldo -= this.valorAposta
             this.versus.conta.saldo += this.valorAposta
+            this.reply.status = 'perdeu'
 
         } 
         else if (this.player1.pontos === this.player2.pontos) this.reply.message = `Empate!`

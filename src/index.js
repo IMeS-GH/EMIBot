@@ -166,6 +166,14 @@ client.on('messageCreate', (message) => {
 
         resposta.on('end', () => {
             message.reply(`${jogo.reply.message}, Fim do jogo!`)
+
+            if (jogo.reply.status === 'perdeu' && conta.saldo < 0){
+                message.author.send('Ora ora... Parece que você está sem dinheiro')
+                setTimeout(() => message.author.send('*Infelizmente, nosso contrato encerra aqui.*'), 6000)
+                setTimeout(() => message.author.send('https://i1.sndcdn.com/avatars-6MYmIsqrQG5zqYs7-CAXKkg-t500x500.jpg'), 10000)
+                setTimeout(() => message.author.send('**Hasta la vista**'), 15000)
+
+            }
         })
     }
 
