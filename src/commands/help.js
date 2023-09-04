@@ -9,7 +9,8 @@ module.exports = {
         ${prefix}jokenpo <emoji> - Joga um jogo
         ${prefix}trab - Trabalha para ganhar dinheiro
         ${prefix}transferir <conta> <valor> - Realiza uma transferencia
-        ${prefix}aposta <cor> <valor> - Realiza uma aposta`;
+        ${prefix}aposta <cor> <valor> - Realiza uma aposta
+        ${prefix}vinteum <valor> <username> - Inicial um jogo de 21`
 
         message.reply(helpMessage);
     },
