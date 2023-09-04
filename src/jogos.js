@@ -124,6 +124,7 @@ class VinteUm extends Jogo{
         super(autor)
 
         // if (!versus.bot) this.versus = Conta.db.get(versus)
+        if (isNaN(valorAposta)) return {message: 'Algo deu errado.'}
 
         this.versus = versus
         this.versus.conta = Conta.db.get(versus.username) || {saldo: 0}

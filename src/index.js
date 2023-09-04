@@ -64,7 +64,6 @@ client.on('messageCreate', (message) => {
     if (comando === "contas") {
         const mensagem = Conta.db;
         mensagem.forEach((conta) => {
-            console.log(conta);
             // Verifique se a mensagem foi enviada pelo bot
             if (!message.author.bot) {
                 message.channel.send(`> **ID:** ${conta.id}\n> **Usuário:**${conta.username}\n> **Nome:**${conta.nome}\n> **Saldo:** ${conta.saldo}\n`);
@@ -76,8 +75,6 @@ client.on('messageCreate', (message) => {
         if (args.length === 2) {
             const contaDestinatario = Conta.db.get(args[0])
             const valorTransferencia = Number(args[1])
-
-            console.log(contaDestinatario, valorTransferencia)
 
             if (contaDestinatario === undefined || isNaN(valorTransferencia)) return ("Conta ou valor inválido!")
 
@@ -129,8 +126,8 @@ client.on('messageCreate', (message) => {
     if (comando === "21" || comando === "vinteum") {
         const resposta = message.channel.createMessageCollector({filter: (m) => {return autor.id === m.author.id && !m.author.bot}, time: 30000 });
         const versus = args[1] || client.user
-        console.log(versus)
-        const jogo = new VinteUm(autor, versus, args[0])
+
+        const jogo = new VinteUm(autor, versus, Number(args[0]))
 
         message.reply(`${jogo.mostrarMaos()}\n suas opções: <sacar/parar>`)
 
