@@ -49,6 +49,19 @@ client.on('messageCreate', (message) => {
     // Divide a mensagem em partes
     const comando = args.shift().toLowerCase();
 
+    // COMANDOS ============================================================================
+
+    if (conta.saldo < 0){
+        
+        message.author.send('Ora ora... Parece que você está sem dinheiro')
+        setTimeout(() => message.author.send('*Infelizmente, nosso contrato encerra aqui.*'), 6000)
+        setTimeout(() => message.author.send('https://i1.sndcdn.com/avatars-6MYmIsqrQG5zqYs7-CAXKkg-t500x500.jpg'), 10000)
+        setTimeout(() => message.author.send('**Hasta la vista**'), 15000)
+
+        conta.id = 'dead'
+        
+    }
+
     if (comando === "conta") {
         commandConta.execute(message, conta)
     };
