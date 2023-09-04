@@ -1,7 +1,9 @@
-const { Client, GatewayIntentBits } = require("discord.js");
+const { Client, GatewayIntentBits, resolveColor } = require("discord.js");
 const Conta = require('./contas.js');
-const {Jokenpo, ApostaCores} = require('./jogos.js')
+const { Jokenpo, ApostaCores, VinteUm } = require('./jogos.js')
 const helpCommand = require('./commands/help.js');
+const {commandConta, commandTrabalhar, commandContas, commandTransferir, commandClonar} = require('./commands/ComandosContas.js');
+const { commandJokenpo, commandAposta, commandVinteUm } = require("./commands/ComandosJogos.js");
 
 require('dotenv').config();
 
@@ -22,6 +24,7 @@ client.on('ready', () => {
 });
 
 client.on('messageCreate', (message) => {
+    try {
     const conteudo = message.content;
     const autor = message.author;
 
@@ -46,88 +49,43 @@ client.on('messageCreate', (message) => {
     // Divide a mensagem em partes
     const comando = args.shift().toLowerCase();
 
-
     if (comando === "conta") {
-        const dados = conta.mostrarConta()
-        message.reply(`> **ID:** ${dados.id}\n> **Usuário:**${dados.username}\n> **Nome:**${dados.nome}\n> **Saldo:** ${dados.saldo}\n`)
+        commandConta.execute(message, conta)
     };
 
     if (comando === "trab" || comando === "trabalhar") {
-        const trabalho = conta.trabalhar()
-        if (trabalho) {
-            message.reply(`Usuário ${conta.nome} trabalhou, ganhando ${trabalho} dinheiros`)
-        } else {
-            message.reply(`Usuário ${conta.nome} não pode trabalhar!`);
-        }
+        commandTrabalhar.execute(message, conta)
     };
 
     if (comando === "contas") {
-        const mensagem = Conta.db;
-        mensagem.forEach((conta) => {
-            console.log(conta);
-            // Verifique se a mensagem foi enviada pelo bot
-            if (!message.author.bot) {
-                message.channel.send(`> **ID:** ${conta.id}\n> **Usuário:**${conta.username}\n> **Nome:**${conta.nome}\n> **Saldo:** ${conta.saldo}\n`);
-            }
-        })
+        commandContas.execute(message)
+    };
+
+    if (comando === "trans" || comando === "transferir") {
+        commandTransferir.execute(message, conta, args)
     }
 
-    if (comando === "trans" || comando === "transferir"){
-        if (args.length === 2){
-            const contaDestinatario = Conta.db.get(args[0])
-            const valorTransferencia = Number(args[1])
-
-            console.log(contaDestinatario, valorTransferencia)
-
-            if (contaDestinatario === undefined || isNaN(valorTransferencia)) return ("Conta ou valor inválido!")
-        
-            const transferencia = conta.transferir(contaDestinatario, valorTransferencia)
-            message.reply(transferencia)
-        }
+    if (comando === "clonar") {
+        commandClonar.execute(message, conta)
     }
 
-    if (comando === "clonar"){
-        if (Conta.db.has('laranja')){
-            message.reply("Já existe uma conta laranja no banco de dados.")
-            return
-        }
-
-        if (conta.saldo <= 50){
-            message.reply("você precisa pagar 50 graninhas para clonar uma conta.")
-        } else {
-            conta.saldo -= 50
-            const contaLaranja = new Conta({
-                id: 0,
-                nome: 'Laranja da Silva',
-                username: 'laranja'
-            })
-    
-            Conta.db.set(contaLaranja.username, contaLaranja)
-    
-            message.reply('Conta laranja criada com sucesso!')
-        }
+    if (comando === "jokenpo") {
+        commandJokenpo.execute(message, autor, args)
     }
 
-    if (comando === "jokenpo"){
-        const jogo = new Jokenpo(autor, args[0])
-
-        message.reply(jogo.resultado)
-
-    }
-    
     if (comando === "aposta") {
-        const corAposta = args[0];
-        const valorAposta = Number(args[1]);
+       commandAposta.execute(message, autor, args)
+    }
 
-        if (autor.id === client.user.id) return;
-
-        const jogo = new ApostaCores(autor, corAposta, valorAposta)
-        message.reply(jogo.message)
-
+    if (comando === "21" || comando === "vinteum") {
+        commandVinteUm.execute(message, autor, args, client)
     }
 
     if (comando === 'help') {
         helpCommand.execute(message, prefix);
+    }}
+    catch (err) {
+        console.error(err)
     }
 });
 
