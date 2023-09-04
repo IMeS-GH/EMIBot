@@ -70,6 +70,10 @@ client.on('messageCreate', (message) => {
         commandTrabalhar.execute(message, conta)
     };
 
+    if (comando === "calopsita"){
+        commandCalopsita.execute(message)
+    }
+
     if (comando === "contas") {
         commandContas.execute(message)
     };
