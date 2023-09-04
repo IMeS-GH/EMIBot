@@ -2,7 +2,7 @@ const Conta = require("./contas")
 
 class Jogo{
     
-    static tipos = ['Jokenpo', '21', 'ApostaCores']
+    static tipos = ['Jokenpo', 'VinteUm', 'ApostaCores']
 
     /**
      * 
@@ -102,4 +102,110 @@ class ApostaCores extends Jogo{
     }
 }
 
-module.exports = {ApostaCores, Jokenpo}
+class VinteUm extends Jogo{
+
+    static Cartas = new Map([
+        ['1', 1],
+        ['2', 2],
+        ['3', 3],
+        ['4', 4],
+        ['5', 5],
+        ['6', 6],
+        ['7', 7],
+        ['8', 8],
+        ['9', 9],
+        ['10', 10],
+        ['J', 10],
+        ['Q', 10],
+        ['K', 10]
+    ])
+
+    constructor(autor, versus, valorAposta=100){
+        super(autor)
+
+        // if (!versus.bot) this.versus = Conta.db.get(versus)
+
+        this.versus = versus
+        this.versus.conta = Conta.db.get(versus.username) || {saldo: 0}
+        this.reply = {status: 'fail', message: 'Algo deu errado', valor: 0}
+        this.valorAposta = valorAposta
+
+        this.player1 = {
+            baralho: [...VinteUm.gerarCarta()],
+            pontos: 0,
+            sacar : function sacar(){
+                const carta = VinteUm.gerarCarta()
+                this.baralho.push(carta)
+                this.atualizarPontos()
+            },
+            atualizarPontos : function atualizarPontos(){
+                this.pontos = VinteUm.calcularPontos(this.baralho)
+            },
+        }
+        this.player1.pontos = VinteUm.calcularPontos(this.player1.baralho)
+
+        this.player2 = {
+            baralho: [...VinteUm.gerarCarta(2)],
+            pontos: 0,
+            sacar : function sacar(){
+                const carta = VinteUm.gerarCarta()
+                this.baralho.push(carta)
+                this.atualizarPontos()
+            },
+            atualizarPontos : function atualizarPontos(){
+                this.pontos = VinteUm.calcularPontos(this.baralho)
+            },
+        }
+
+        this.player2.pontos = VinteUm.calcularPontos(this.player2.baralho)
+
+    }
+
+    pararJogo(){
+        if (this.player1.pontos > 21){
+            this.reply.message = `${this.autor.username} Perdeu!`
+            this.contaAutor.saldo -= this.valorAposta
+            this.versus.conta.saldo += this.valorAposta
+        } 
+        else if (this.player2.pontos > 21) {
+            this.reply.message = `${this.versus.username} Perdeu!`
+            this.contaAutor.saldo += this.valorAposta
+            this.versus.conta.saldo -= this.valorAposta
+        } 
+        else if (this.player1.pontos > this.player2.pontos) {
+            this.reply.message = `${this.autor.username} Venceu!`
+            this.contaAutor.saldo += this.valorAposta
+            this.versus.conta.saldo -= this.valorAposta
+        }
+        else if (this.player1.pontos < this.player2.pontos) {
+            this.reply.message = `${this.versus.username} Venceu!`
+            this.contaAutor.saldo -= this.valorAposta
+            this.versus.conta.saldo += this.valorAposta
+
+        } 
+        else if (this.player1.pontos === this.player2.pontos) this.reply.message = `Empate!`
+    }
+
+    mostrarMaos(){
+        return `**${this.autor.username}:** ${this.player1.baralho} (${this.player1.pontos} pontos)\n**${this.versus.username}:** ${this.player2.baralho} (${this.player2.pontos} pontos)`
+    }
+    
+    static gerarCarta(num=1){
+
+        const baralho = []
+
+        for (let i = 0; i < num; i++){
+            const carta =  [...VinteUm.Cartas.keys()][1 + parseInt(Math.random() * 12)]
+            baralho.push(carta)
+        }
+
+        return baralho.length === 1 ? baralho[0] : baralho
+    }
+    
+    static calcularPontos(baralho){
+        const valor = baralho.reduce((acc, carta) => acc + VinteUm.Cartas.get(carta), 0)
+        return valor
+    }
+}
+
+module.exports = {ApostaCores, Jokenpo, VinteUm}

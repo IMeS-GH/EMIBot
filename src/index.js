@@ -1,6 +1,6 @@
 const { Client, GatewayIntentBits } = require("discord.js");
 const Conta = require('./contas.js');
-const {Jokenpo, ApostaCores} = require('./jogos.js')
+const { Jokenpo, ApostaCores, VinteUm } = require('./jogos.js')
 const helpCommand = require('./commands/help.js');
 
 require('dotenv').config();
@@ -72,27 +72,27 @@ client.on('messageCreate', (message) => {
         })
     }
 
-    if (comando === "trans" || comando === "transferir"){
-        if (args.length === 2){
+    if (comando === "trans" || comando === "transferir") {
+        if (args.length === 2) {
             const contaDestinatario = Conta.db.get(args[0])
             const valorTransferencia = Number(args[1])
 
             console.log(contaDestinatario, valorTransferencia)
 
             if (contaDestinatario === undefined || isNaN(valorTransferencia)) return ("Conta ou valor inválido!")
-        
+
             const transferencia = conta.transferir(contaDestinatario, valorTransferencia)
             message.reply(transferencia)
         }
     }
 
-    if (comando === "clonar"){
-        if (Conta.db.has('laranja')){
+    if (comando === "clonar") {
+        if (Conta.db.has('laranja')) {
             message.reply("Já existe uma conta laranja no banco de dados.")
             return
         }
 
-        if (conta.saldo <= 50){
+        if (conta.saldo <= 50) {
             message.reply("você precisa pagar 50 graninhas para clonar uma conta.")
         } else {
             conta.saldo -= 50
@@ -101,20 +101,20 @@ client.on('messageCreate', (message) => {
                 nome: 'Laranja da Silva',
                 username: 'laranja'
             })
-    
+
             Conta.db.set(contaLaranja.username, contaLaranja)
-    
+
             message.reply('Conta laranja criada com sucesso!')
         }
     }
 
-    if (comando === "jokenpo"){
+    if (comando === "jokenpo") {
         const jogo = new Jokenpo(autor, args[0])
 
         message.reply(jogo.message)
 
     }
-    
+
     if (comando === "aposta") {
         const corAposta = args[0];
         const valorAposta = Number(args[1]);
@@ -124,6 +124,49 @@ client.on('messageCreate', (message) => {
         const jogo = new ApostaCores(autor, corAposta, valorAposta)
         message.reply(jogo.message)
 
+    }
+
+    if (comando === "21" || comando === "vinteum") {
+        const resposta = message.channel.createMessageCollector({filter: (m) => {return autor.id === m.author.id && !m.author.bot}, time: 30000 });
+        const versus = args[1] || client.user
+        console.log(versus)
+        const jogo = new VinteUm(autor, versus, args[0])
+
+        message.reply(`${jogo.mostrarMaos()}\n suas opções: <sacar/parar>`)
+
+        resposta.on('collect', (response) => {
+            if (response.content === 'sacar') {
+
+                jogo.player1.sacar()
+                message.reply(`**${autor.username}** sacou uma carta!`)
+                message.reply(`${jogo.mostrarMaos()}`)
+
+                if (jogo.player1.pontos > 21) {
+                    jogo.pararJogo()
+                    resposta.stop()
+                }
+                else if (jogo.player2.pontos <= 13 || jogo.player2.pontos <= jogo.player1.pontos){
+                    jogo.player2.sacar()
+                    message.reply(`**${versus.username}** sacou uma carta!`)
+                    message.reply(`${jogo.mostrarMaos()}`)
+                    if (jogo.player2.pontos > 21) {
+                        jogo.pararJogo()
+                        resposta.stop()
+                    }
+                }
+            }
+            else if (response.content === 'parar'){
+
+                jogo.pararJogo()
+                message.reply(`${jogo.mostrarMaos()}`)
+                resposta.stop()
+
+            }
+        })
+
+        resposta.on('end', () => {
+            message.reply(`${jogo.reply.message}, Fim do jogo!`)
+        })
     }
 
     if (comando === 'help') {
