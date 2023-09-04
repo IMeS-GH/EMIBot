@@ -44,11 +44,15 @@ class Jokenpo extends Jogo{
 
         this.player = Jokenpo.opcoes.get(escolha_player)
         this.bot = Jokenpo.opcoes.get(Jokenpo.opKeys[Math.floor(Math.random() * 3)])
+        this.reply = {message: 'Algo deu errado', status: 'fail'}
 
-        if (this.player.emoji === this.bot.emoji) return {resultado: `${this.autor.globalName} ${this.player.emoji} x ${this.bot.emoji}, empate!`}
-        if (this.player.vence === this.bot.emoji) return {resultado: `${this.autor.globalName} ${this.player.emoji} x ${this.bot.emoji}, você venceu!`}
-        if (this.player.perde === this.bot.emoji) return {resultado: `${this.autor.globalName} ${this.player.emoji} x ${this.bot.emoji}, você perdeu!`}
-        return {resultado: `${this.player.emoji}, ${this.bot.emoji}`}
+        if (this.player.emoji === this.bot.emoji) this.reply = {status: 'ok', valor: 0, message: `${this.autor.globalName} ${this.player.emoji} x ${this.bot.emoji}, empate!`}
+        if (this.player.vence === this.bot.emoji) this.reply = {status: 'ok', valor: 100, message: `${this.autor.globalName} ${this.player.emoji} x ${this.bot.emoji}, você venceu!`}
+        if (this.player.perde === this.bot.emoji) this.reply = {status: 'ok', valor: -100, message: `${this.autor.globalName} ${this.player.emoji} x ${this.bot.emoji}, você perdeu!`}
+       
+        this.contaAutor.saldo += this.reply.valor
+       
+        return this.reply
     }
 
 }

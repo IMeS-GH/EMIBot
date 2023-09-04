@@ -111,7 +111,7 @@ client.on('messageCreate', (message) => {
     if (comando === "jokenpo"){
         const jogo = new Jokenpo(autor, args[0])
 
-        message.reply(jogo.resultado)
+        message.reply(jogo.message)
 
     }
     
