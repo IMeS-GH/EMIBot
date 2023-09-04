@@ -1,12 +1,14 @@
 const commandCalopsita = 
 {
-    name: 'Calopstia',
-    description: 'Mostra calopsita',
+    name: "Calopsita",
+    description: "Mostra calopsita",
 
     execute(message){
         const calopsitas = []
 
-        message.reply('Piu')
+        message.reply("Piu")
     }
 
 }
+
+module.exports = {commandCalopsita}

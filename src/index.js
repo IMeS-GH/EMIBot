@@ -1,14 +1,15 @@
 const { Client, GatewayIntentBits, resolveColor } = require("discord.js");
-const Conta = require('./contas.js');
-const { Jokenpo, ApostaCores, VinteUm } = require('./jogos.js')
-const helpCommand = require('./commands/help.js');
-const {commandConta, commandTrabalhar, commandContas, commandTransferir, commandClonar} = require('./commands/ComandosContas.js');
+const Conta = require("./contas.js");
+const { Jokenpo, ApostaCores, VinteUm } = require("./jogos.js")
+const helpCommand = require("./commands/help.js");
+const { commandConta, commandTrabalhar, commandContas, commandTransferir, commandClonar } = require("./commands/ComandosContas.js");
 const { commandJokenpo, commandAposta, commandVinteUm } = require("./commands/ComandosJogos.js");
+const { commandCalopsita } = require("./commands/ComandosMisc.js")
 
-require('dotenv').config();
+require("dotenv").config();
 
 const token = process.env.token;
-const prefix = process.env.prefix || '!'; // Se o prefix não for encontrado no arquivo .env, ! é utilizado
+const prefix = process.env.prefix || "!"; // Se o prefix não for encontrado no arquivo .env, ! é utilizado
 
 const client = new Client({
     intents: [
@@ -19,16 +20,16 @@ const client = new Client({
 
 });
 
-client.on('ready', () => {
+client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
-client.on('messageCreate', (message) => {
+client.on("messageCreate", (message) => {
     try {
     const conteudo = message.content;
     const autor = message.author;
 
-    const args = conteudo.slice(prefix.length).split(' ');
+    const args = conteudo.slice(prefix.length).split(" ");
 
     if (!Conta.db.has(autor.username) && !autor.bot) {
         const novaConta = new Conta({
@@ -53,12 +54,12 @@ client.on('messageCreate', (message) => {
 
     if (conta.saldo < 0){
         
-        message.author.send('Ora ora... Parece que você está sem dinheiro')
-        setTimeout(() => message.author.send('*Infelizmente, nosso contrato encerra aqui.*'), 6000)
-        setTimeout(() => message.author.send('https://i1.sndcdn.com/avatars-6MYmIsqrQG5zqYs7-CAXKkg-t500x500.jpg'), 10000)
-        setTimeout(() => message.author.send('**Hasta la vista**'), 15000)
+        message.author.send("Ora ora... Parece que você está sem dinheiro")
+        setTimeout(() => message.author.send("*Infelizmente, nosso contrato encerra aqui.*"), 6000)
+        setTimeout(() => message.author.send("https://i1.sndcdn.com/avatars-6MYmIsqrQG5zqYs7-CAXKkg-t500x500.jpg"), 10000)
+        setTimeout(() => message.author.send("**Hasta la vista**"), 15000)
 
-        conta.id = 'dead'
+        conta.id = "dead"
         
     }
 
@@ -98,7 +99,7 @@ client.on('messageCreate', (message) => {
         commandVinteUm.execute(message, autor, args, client)
     }
 
-    if (comando === 'help') {
+    if (comando === "help") {
         helpCommand.execute(message, prefix);
     }}
     catch (err) {
