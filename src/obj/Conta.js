@@ -36,11 +36,15 @@ class Conta {
     }
 
     depositar(destinatario, valor){
-       
-        this.saldo -= valor;
-        destinatario.saldo += valor;
+        if(!this.saldo < valor){
+            this.saldo -= valor;
+            destinatario.saldo += valor;
 
-
+            let novoSaldo = this.saldo;
+            return novoSaldo
+        }else{
+            return false
+        }
     }
     
 }

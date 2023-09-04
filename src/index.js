@@ -42,6 +42,7 @@ client.on('messageCreate', (message) => {
             message.reply(`informações do usúario ${info.nome}\n\nIdentificado como ${info.nick}\nSaldo: ${info.saldo}\nSituação: ${info.situacao}\nDescanso: ${info.descanso} `)
         }
         if (conteudo.includes('transferir')) {
+            const conta = Conta.db.get(autor.id);
            if(args.length === 1){
             
             message.channel.send('Para qual usuário você deseja realizar uma transferência?');
@@ -107,20 +108,47 @@ client.on('messageCreate', (message) => {
                     message.channel.send('Tempo limite de resposta para o destinatário expirado.');
                 }
             });
-           }else if(args.length === 3){
-            const destinatario = args[1];
+           }else if (args.length === 3) {
+            const userName = args[1];
+            const destinatario = Conta.db.get(userName);
+            
             const valor = Number(args[2]);
-
-            if(destinatario === typeof(string) && valor === typeof(Number)){
-                
-            }else{
-                message.reply(`Formato correto: $transferir <usuario> <valor> ou apenas $transferir`)
+            console.log(destinatario, valor);
+        
+            if (typeof destinatario === 'string' && typeof valor === 'number') {
+                const operacao = conta.depositar(destinatario, valor);
+                if (operacao) {
+                    message.channel.send(`Transação concluída, seu novo saldo é de R$${operacao}`);
+                }else{
+                    message.channel.send('deu algum bo')
+                }
+            } else {
+                message.reply(`Formato correto:\n\n$transferir <usuario> <valor> ou apenas $transferir`);
             }
-           }
+        }
             
         }
         if(conteudo.includes('apostar')){
             message.reply(`É o cassino o jogo da galera`)
+        }
+        if(conteudo.includes('clone')){
+                // Cria um novo usuário "laranja" com as mesmas propriedades que um usuario normal
+                if (!Conta.db.has('idLaranja')) {
+                    const novoUsuario = new Conta({ id: 'idLaranja', nome: 'Laranja', nick: 'laranja' });
+                    Conta.db.set(novoUsuario.id, novoUsuario);
+                    message.reply('Usuário "Laranja" criado com sucesso!');
+                } else {
+                    message.reply('O usuário "Laranja" já existe.');
+            }
+        }
+        if(conteudo.includes('contas')){
+            let listaContas = 'Conteúdo do Banco de Dados:\n';
+
+        for (const [id, conta] of Conta.db.entries()) {
+            listaContas += `ID: ${id}, Nome: ${conta.nome}, Nick: ${conta.nick}, Saldo: ${conta.saldo}\n`;
+        }
+
+        message.reply(listaContas);
         }
         }
     }
