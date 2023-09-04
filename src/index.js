@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits } = require("discord.js");
+const { Client, GatewayIntentBits, resolveColor } = require("discord.js");
 const Conta = require('./contas.js');
 const { Jokenpo, ApostaCores, VinteUm } = require('./jogos.js')
 const helpCommand = require('./commands/help.js');
@@ -22,6 +22,7 @@ client.on('ready', () => {
 });
 
 client.on('messageCreate', (message) => {
+    try {
     const conteudo = message.content;
     const autor = message.author;
 
@@ -49,7 +50,7 @@ client.on('messageCreate', (message) => {
 
     if (comando === "conta") {
         const dados = conta.mostrarConta()
-        if (dados.id !== 'dead'){
+        if (dados.id !== 'dead') {
             message.reply(`> **ID:** ${dados.id}\n> **Usuário:**${dados.username}\n> **Nome:**${dados.nome}\n> **Saldo:** ${dados.saldo}\n`)
         } else {
             message.reply(`> **Usuário ${dados.username} está morto**`)
@@ -129,52 +130,84 @@ client.on('messageCreate', (message) => {
     }
 
     if (comando === "21" || comando === "vinteum") {
-        const resposta = message.channel.createMessageCollector({filter: (m) => {return autor.id === m.author.id && !m.author.bot}, time: 30000 });
-        const versus = args[1] || client.user
+        const resposta = message.channel.createMessageCollector({ filter: (m) => { return !m.author.bot }, time: 60000 });
+        if (args[1] !== undefined && !Conta.db.has(args[1])) {
+            message.reply('Esse usuário não existe no banco de dados')
+            throw new Error({ctx:message, message: 'Esse usuário não existe no banco de dados'})
+        }
+        const versus = Conta.db.get(args[1]) || client.user
+ 
 
         const jogo = new VinteUm(autor, versus, args[0])
 
         message.reply(`${jogo.mostrarMaos()}\n suas opções: <sacar/parar>`)
 
+        
         resposta.on('collect', (response) => {
+            
+            if (response.content === "mostrar"){
+                message.reply(`${jogo.mostrarMaos()}\n`)
+            }
+
             if (response.content === 'sacar') {
+                if (jogo.player1.turno && jogo.player1.user.id === response.author.id) {
+                    message.reply(jogo.player1.sacar())
+                    jogo.player1.passarTurno(jogo.player2)
+                }
+                if (jogo.player2.turno && jogo.player2.user.id === response.author.id) {
+                    message.reply(jogo.player2.sacar())
+                    jogo.player2.passarTurno(jogo.player1)
 
-                jogo.player1.sacar()
-                message.reply(`**${autor.username}** sacou uma carta!`)
-                message.reply(`${jogo.mostrarMaos()}`)
+                }
+                if (versus.bot && jogo.player2.turno) {
+                    if (jogo.player2.pontos <= 13 || jogo.player2.pontos < jogo.player1.pontos) {
+                        message.reply(jogo.player2.sacar())
+                    } 
+                    jogo.player2.passarTurno(jogo.player1)
+                }
 
-                if (jogo.player1.pontos > 21) {
+                if (jogo.player1.pontos > 21 || jogo.player2.pontos > 21) {
+
+                    jogo.pararJogo()   
+                    resposta.stop()
+                }
+
+            }
+
+            else if (response.content === 'parar') {
+                if (response.author.id === jogo.player1.user.id && !versus.bot) {
+                    message.reply(jogo.player1.passarTurno(jogo.player2))
+                } else if (response.author.id === jogo.player2.user.id && !versus.bot) {
+                    jogo.player2.passarTurno(jogo.player1)
+                } else if (versus.bot && jogo.player2.user.pontos >= 16) {
+                    jogo.pararJogo()
+                    resposta.stop()
+                } else {
                     jogo.pararJogo()
                     resposta.stop()
                 }
-                else if (jogo.player2.pontos <= 13 || jogo.player2.pontos <= jogo.player1.pontos){
-                    jogo.player2.sacar()
-                    message.reply(`**${versus.username}** sacou uma carta!`)
-                    message.reply(`${jogo.mostrarMaos()}`)
-                    if (jogo.player2.pontos > 21) {
-                        jogo.pararJogo()
-                        resposta.stop()
-                    }
-                }
-            }
-            else if (response.content === 'parar'){
-
-                jogo.pararJogo()
-                message.reply(`${jogo.mostrarMaos()}`)
-                resposta.stop()
-
             }
         })
-
         resposta.on('end', () => {
+            message.reply(`${jogo.mostrarMaos()}\n`)
             message.reply(`${jogo.reply.message}, Fim do jogo!`)
 
-            if (jogo.reply.status === 'perdeu' && conta.saldo < 0){
+            const conta2 = Conta.db.get(versus.username) || {saldo: 0}
+            console.log(conta2)
+
+            if (jogo.reply.status === 'perdeu') {
+                conta.saldo -= jogo.valorAposta
+                conta2.saldo += jogo.valorAposta
+            } else {
+                conta.saldo += jogo.valorAposta
+                conta2.saldo -= jogo.valorAposta
+            }
+
+            if (jogo.reply.status === 'perdeu' && conta.saldo < 0) {
                 message.author.send('Ora ora... Parece que você está sem dinheiro')
                 setTimeout(() => message.author.send('*Infelizmente, nosso contrato encerra aqui.*'), 6000)
                 setTimeout(() => message.author.send('https://i1.sndcdn.com/avatars-6MYmIsqrQG5zqYs7-CAXKkg-t500x500.jpg'), 10000)
                 setTimeout(() => message.author.send('**Hasta la vista**'), 15000)
-
 
                 conta.id = 'dead'
             }
@@ -183,6 +216,9 @@ client.on('messageCreate', (message) => {
 
     if (comando === 'help') {
         helpCommand.execute(message, prefix);
+    }}
+    catch (err) {
+        console.error(err)
     }
 });
 

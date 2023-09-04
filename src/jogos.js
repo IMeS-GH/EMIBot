@@ -102,6 +102,32 @@ class ApostaCores extends Jogo{
     }
 }
 
+class Player {
+
+    constructor(user, turno){
+
+        this.user = Conta.db.get(user) || new Conta({id: user.id, nome: user.nome, username: user.username})
+        this.baralho = []
+        this.pontos = 0
+        this.turno = turno
+        this.bot = user.bot
+    }
+
+    passarTurno(player){
+        this.turno = false
+        player.turno = true
+        return `${this.user.username} Passou o turno! agora é a vez de ${player.user.username}`
+    }
+    
+    sacar (){
+        const carta = VinteUm.gerarCarta()
+        this.baralho.push(carta)
+        this.pontos = this.baralho.reduce((acc, carta) => acc + VinteUm.Cartas.get(carta), 0)
+        return `${this.user.username} sacou uma carta! A carta é **${carta}**.`
+    }
+
+}
+
 class VinteUm extends Jogo{
 
     static Cartas = new Map([
@@ -120,78 +146,6 @@ class VinteUm extends Jogo{
         ['K', 10]
     ])
 
-    constructor(autor, versus, valorAposta=100){
-        super(autor)
-        
-        this.versus = versus
-        this.versus.conta = Conta.db.get(versus.username) || {saldo: 0}
-        this.reply = {status: 'fail', message: 'Algo deu errado', valor: 0}
-        this.valorAposta = Number(valorAposta)
-
-        this.player1 = {
-            baralho: [...VinteUm.gerarCarta()],
-            pontos: 0,
-            sacar : function sacar(){
-                const carta = VinteUm.gerarCarta()
-                this.baralho.push(carta)
-                this.atualizarPontos()
-            },
-            atualizarPontos : function atualizarPontos(){
-                this.pontos = VinteUm.calcularPontos(this.baralho)
-            },
-        }
-        this.player1.pontos = VinteUm.calcularPontos(this.player1.baralho)
-
-        this.player2 = {
-            baralho: [...VinteUm.gerarCarta(2)],
-            pontos: 0,
-            sacar : function sacar(){
-                const carta = VinteUm.gerarCarta()
-                this.baralho.push(carta)
-                this.atualizarPontos()
-            },
-            atualizarPontos : function atualizarPontos(){
-                this.pontos = VinteUm.calcularPontos(this.baralho)
-            },
-        }
-
-        this.player2.pontos = VinteUm.calcularPontos(this.player2.baralho)
-
-    }
-
-    pararJogo(){
-        if (this.player1.pontos > 21){
-            this.reply.message = `${this.autor.username} Perdeu!`
-            this.contaAutor.saldo -= this.valorAposta
-            this.versus.conta.saldo += this.valorAposta
-            this.reply.status = 'venceu'
-        } 
-        else if (this.player2.pontos > 21) {
-            this.reply.message = `${this.versus.username} Perdeu!`
-            this.contaAutor.saldo += this.valorAposta
-            this.versus.conta.saldo -= this.valorAposta
-            this.reply.status = 'perdeu'
-        } 
-        else if (this.player1.pontos > this.player2.pontos) {
-            this.reply.message = `${this.autor.username} Venceu!`
-            this.contaAutor.saldo += this.valorAposta
-            this.versus.conta.saldo -= this.valorAposta
-            this.reply.status = 'venceu'
-        }
-        else if (this.player1.pontos < this.player2.pontos) {
-            this.reply.message = `${this.versus.username} Venceu!`
-            this.contaAutor.saldo -= this.valorAposta
-            this.versus.conta.saldo += this.valorAposta
-            this.reply.status = 'perdeu'
-
-        } 
-        else if (this.player1.pontos === this.player2.pontos) this.reply.message = `Empate!`
-    }
-
-    mostrarMaos(){
-        return `**${this.autor.username}:** ${this.player1.baralho} (${this.player1.pontos} pontos)\n**${this.versus.username}:** ${this.player2.baralho} (${this.player2.pontos} pontos)`
-    }
-    
     static gerarCarta(num=1){
 
         const baralho = []
@@ -203,10 +157,50 @@ class VinteUm extends Jogo{
 
         return baralho.length === 1 ? baralho[0] : baralho
     }
-    
-    static calcularPontos(baralho){
-        const valor = baralho.reduce((acc, carta) => acc + VinteUm.Cartas.get(carta), 0)
-        return valor
+
+
+    constructor(autor, versus, valorAposta=100){
+        super(autor)
+        
+        this.versus = versus
+        this.reply = {status: 'fail', message: 'Algo deu errado', valor: 0}
+        this.valorAposta = Number(valorAposta)
+        this.player1 = new Player(autor, true)
+        this.player2 = new Player(versus, false)
+
+    }
+
+    pararJogo(){
+        if (this.player1.pontos > 21){
+            this.reply.message = `${this.autor.username} Perdeu!`
+            this.player1.user.saldo -= this.valorAposta
+            this.player2.user.saldo += this.valorAposta
+            this.reply.status = 'perdeu'
+        } 
+        else if (this.player2.pontos > 21) {
+            this.reply.message = `${this.versus.username} Perdeu!`
+            this.player1.user.saldo += this.valorAposta
+            this.player2.user.saldo -= this.valorAposta
+            this.reply.status = 'venceu'
+        } 
+        else if (this.player1.pontos > this.player2.pontos) {
+            this.reply.message = `${this.autor.username} Venceu!`
+            this.player1.user.saldo += this.valorAposta
+            this.player2.user.saldo -= this.valorAposta
+            this.reply.status = 'venceu'
+        }
+        else if (this.player1.pontos < this.player2.pontos) {
+            this.reply.message = `${this.versus.username} Venceu!`
+            this.player1.user.saldo -= this.valorAposta
+            this.player2.user.saldo += this.valorAposta
+            this.reply.status = 'perdeu'
+
+        } 
+        else if (this.player1.pontos === this.player2.pontos) this.reply.message = `Empate!`
+    }
+
+    mostrarMaos(){
+        return `**${this.autor.username}:** ${this.player1.baralho} (${this.player1.pontos} pontos)\n**${this.versus.username}:** ${this.player2.baralho} (${this.player2.pontos} pontos)`
     }
 }
 
