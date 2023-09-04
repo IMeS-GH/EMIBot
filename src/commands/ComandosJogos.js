@@ -32,6 +32,19 @@ const commandVinteUm = {
     description: 'Inicial um jogo de 21',
 
     execute(message, autor, args, client){
+        if (Conta.db.get(autor.username).saldo < args[0]) {
+            message.reply('Você não tem saldo o suficienta para essa aposta')
+            return
+        }
+        if (args[0] < 0){
+            message.reply('Você não pode apostar um número negativo.')
+            return
+        }
+        if (isNaN(Number(args[0]))){
+            message.reply('Valor de aposta precisa ser  um número.')
+            return
+        }
+
         const resposta = message.channel.createMessageCollector({ filter: (m) => { return !m.author.bot }, time: 60000 });
         if (args[1] !== undefined && !Conta.db.has(args[1])) {
             message.reply('Esse usuário não existe no banco de dados')
