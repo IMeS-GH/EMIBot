@@ -50,13 +50,34 @@ const validation = {
          
          this.salvarDados(dados);
      },
+    trabalhar(salario, id) {
+        const usuarios = this.carregarDados();
+        let usuario = usuarios.find(usuario => usuario.username == id);
+
+        usuario.saldo += salario;
+
+        this.salvarDados(usuarios);
+    },
+    transferir(destino, valor) {
+        if (valor <= 0) {
+            return "O valor da transferência deve ser maior que zero.";
+        }
+
+        if (this.saldo < valor) {
+            return "Saldo insuficiente para realizar a transferência.";
+        }
+
+        this.saldo -= valor;
+        destino.saldo += valor;
+        return `Transferência bem-sucedida! ${this.nome} transferiu ${valor} dinheiros para ${destino.nome}.`;
+    },
     salvarDados(dados){
-       return fs.writeFileSync(this.filePath, JSON.stringify(dados, null, " "));
-    },
-    carregarDados() {
-        return JSON.parse(fs.readFileSync(this.filePath, "utf-8"));
-    },
-    
+        console.log(dados)
+        return fs.writeFileSync(this.filePath, JSON.stringify(dados, null, " "));
+     },
+     carregarDados() {
+         return JSON.parse(fs.readFileSync(this.filePath, "utf-8"));
+     },
 }
 
 module.exports = validation;

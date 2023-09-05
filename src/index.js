@@ -43,7 +43,7 @@ client.on('messageCreate', (message) => {
             if(validation){
                 const usuario = dataJSON.encontrarUsuario(autor.username);
                 console.log(usuario)
-                let validation = Conta.db.set(autor.username, new Conta({ id: usuario.id, nome: usuario.nome, username: usuario.username }))
+                let validation = Conta.db.set(autor.username, new Conta({ id: usuario.id, nome: usuario.nome, username: usuario.username}))
 
                if(usuario && validation){
                 console.log(`${autor.globalName} cadastrado pelo JSON`);
@@ -58,17 +58,18 @@ client.on('messageCreate', (message) => {
         if (conteudo[0].startsWith(prefix)) { // Verifique se a mensagem começa com o prefixo
             const comando = args.shift().toLowerCase(); // Divide a mensagem em partes
             const conta = Conta.db.get(autor.username) // Conta do usuário do contexto da mensagem
-
+            
             if (comando === "conta") {
-                const dados = conta.mostrarConta()
-                message.reply(`> **ID:** ${dados.id}\n> **Usuário:**${dados.username}\n> **Nome:**${dados.nome}\n> **Saldo:** ${conta.saldo}\n`)
+                const dados = dataJSON.encontrarUsuario(autor.username)
+                message.reply(`> **ID:** ${dados.id}\n> **Usuário:**${dados.username}\n> **Nome:**${dados.nome}\n> **Saldo:** ${dados.saldo}\n`)
             };
 
             if (comando === "trab" || comando === "trabalhar") {
                 const salario = conta.trabalhar()
-
                 if (salario) {
-                    message.reply(`Usuário ${conta.nome} trabalhou, ganhando ${salario} dinheiros.\n\nSaldo atual: ${conta.saldo}`)
+                        const dados = dataJSON.encontrarUsuario(autor.username)
+                        dataJSON.trabalhar(salario, autor.username);
+                        message.reply(`Usuário ${conta.nome} trabalhou, ganhando ${salario} dinheiros.\n\nSaldo atual: ${dados.saldo}`)
                 } else {
                     message.reply(`Usuário ${conta.nome} não pode trabalhar!`);
                 }
@@ -87,10 +88,8 @@ client.on('messageCreate', (message) => {
                     const contaDestinatario = Conta.db.get(args[0])
                     const valorTransferencia = Number(args[1])
 
-                    console.log(contaDestinatario, valorTransferencia)
-
                     if (contaDestinatario === undefined || isNaN(valorTransferencia)) return ("Conta ou valor inválido!")
-
+                    
                     const transferencia = conta.transferir(contaDestinatario, valorTransferencia)
                     message.reply(transferencia)
                 }
